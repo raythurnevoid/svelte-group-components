@@ -1,16 +1,15 @@
 <script lang="ts">
-	import { UseState } from "@rt0/svelte-hooks";
+	import { UseState } from "@raythurnevoid/svelte-hooks";
 	import { createEventDispatcher, onDestroy, onMount, tick } from "svelte";
 	import {
-		ComponentsGroupStore,
 		createComponentsGroupStore,
 	} from "../components-group";
-	import {
+	import type {
 		SelectableItem,
 		OnSelectionGroupOptionsChangeEvent,
 		OnSingleSelectionGroupChangeEvent,
 	} from "./types";
-	import { SelectionGroupBinding } from ".";
+	import type { SelectionGroupBinding } from ".";
 
 	export let value: string = undefined;
 	export let nullable: boolean = true;

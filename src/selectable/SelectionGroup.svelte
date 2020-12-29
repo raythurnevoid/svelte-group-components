@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { SelectionType, SingleSelectionGroup } from ".";
+	import { SingleSelectionGroup } from ".";
 	import MultiSelectionGroup from "./MultiSelectionGroup.svelte";
-	import { SelectionGroupBinding } from "./types";
+	import type { SelectionGroupBinding, SelectionType } from "./types";
 
 	export let selectionType: SelectionType = undefined;
 	export let value: any = undefined;

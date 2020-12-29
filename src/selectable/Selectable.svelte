@@ -3,9 +3,9 @@
 </script>
 
 <script lang="ts">
-	import { UseState } from "@rt0/svelte-hooks";
+	import { UseState } from "@raythurnevoid/svelte-hooks";
 	import { createEventDispatcher, onDestroy, onMount, tick } from "svelte";
-	import {
+	import type {
 		SelectionGroupBinding,
 		OnSelectableChangeEvent,
 		SelectableItem,
