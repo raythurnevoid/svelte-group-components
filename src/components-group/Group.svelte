@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { createComponentsGroupStore } from "../components-group";
-	import type { GroupBindings, GroupItem } from ".";
+	import type { GroupBindings, GroupItemContext } from ".";
 	import type { GroupStore } from "./ComponentsGroupStore";
 
 	let group$ = createComponentsGroupStore();
 
 	const group = {
-		registerItem: (item: GroupItem) => {
+		registerItem: (item: GroupItemContext) => {
 			group$.registerItem(item);
 		},
-		unregisterItem: (item: GroupItem) => {
+		unregisterItem: (item: GroupItemContext) => {
 			group$.unregisterItem(item);
 		},
 	} as GroupBindings;
@@ -18,7 +18,7 @@
 		return group;
 	}
 
-	export function getItems(): GroupItem[] {
+	export function getItems(): GroupItemContext[] {
 		return $group$;
 	}
 

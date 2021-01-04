@@ -8,7 +8,7 @@
 	import type {
 		SelectionGroupBinding,
 		OnSelectableChangeEvent,
-		SelectionGroupItem,
+		SelectionGroupItemContext,
 	} from ".";
 
 	export let group: SelectionGroupBinding = undefined;
@@ -24,7 +24,7 @@
 		change: OnSelectableChangeEvent;
 	}>();
 
-	const self: SelectionGroupItem = {
+	const self: SelectionGroupItemContext = {
 		setSelected(newValue: boolean) {
 			if (selected !== newValue) {
 				_setSelected(newValue);
@@ -37,7 +37,7 @@
 		getContext() {
 			return context;
 		},
-	} as SelectionGroupItem;
+	} as SelectionGroupItemContext;
 
 	onMount(async () => {
 		await tick();

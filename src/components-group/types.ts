@@ -1,10 +1,10 @@
-export interface GroupBindings<T extends GroupItem = GroupItem> {
+export interface GroupBindings<T extends GroupItemContext = GroupItemContext> {
 	registerItem(item: T): void;
 	unregisterItem(item: T): void;
 	getItems(): T[];
 }
 
-export interface GroupItem {
+export interface GroupItemContext {
 	dom: HTMLElement;
 	getContext(): any;
 }

@@ -1,9 +1,9 @@
 import { Writable, writable } from "svelte/store";
 import { beforeOrAfter } from "./domBeforeOrAfter";
-import type { GroupItem } from "./types";
+import type { GroupItemContext } from ".";
 
 export function createComponentsGroupStore<
-	T extends GroupItem
+	T extends GroupItemContext
 >(): GroupStore<T> {
 	const { subscribe, set, update } = writable<T[]>([]);
 
@@ -30,7 +30,8 @@ export function createComponentsGroupStore<
 	};
 }
 
-export interface GroupStore<T extends GroupItem = any> extends Writable<T[]> {
+export interface GroupStore<T extends GroupItemContext = any>
+	extends Writable<T[]> {
 	registerItem(item: T);
 	unregisterItem(item: T);
 }

@@ -5,7 +5,7 @@
 	import type { GroupStore } from "../components-group";
 	import type {
 		SelectionGroupBinding,
-		SelectionGroupItem,
+		SelectionGroupItemContext,
 		OnMultiSelectionGroupChangeEvent,
 		OnSelectionGroupOptionsChangeEvent,
 	} from ".";
@@ -18,7 +18,7 @@
 
 	let groupBindings: SelectionGroupBinding = {
 		getItems() {
-			return group.getItems() as SelectionGroupItem[];
+			return group.getItems() as SelectionGroupItemContext[];
 		},
 		updateItem,
 		registerItem,
@@ -131,7 +131,7 @@
 		//$items$ = [...$items$];
 	}
 
-	function getItemIndex(item: SelectionGroupItem) {
+	function getItemIndex(item: SelectionGroupItemContext) {
 		const items = getItems();
 		return items.indexOf(item);
 	}
@@ -154,13 +154,13 @@
 		}
 	}
 
-	function updateItem(item: SelectionGroupItem) {
+	function updateItem(item: SelectionGroupItemContext) {
 		updateValue();
 		updateItems();
 		// updateItemsRef();
 	}
 
-	async function unregisterItem(item: SelectionGroupItem) {
+	async function unregisterItem(item: SelectionGroupItemContext) {
 		if (!destroyed) {
 			group$.unregisterItem(item);
 			await tick();
@@ -174,7 +174,7 @@
 		}
 	}
 
-	function registerItem(item: SelectionGroupItem) {
+	function registerItem(item: SelectionGroupItemContext) {
 		if (!destroyed) {
 			group$.registerItem(item);
 			if (mounted) {
@@ -207,7 +207,10 @@
 		return groupBindings.getItems();
 	}
 
-	export function setSelected(item: SelectionGroupItem, selected: boolean) {
+	export function setSelected(
+		item: SelectionGroupItemContext,
+		selected: boolean
+	) {
 		if (item.selected !== selected) {
 			item.setSelected(selected);
 			// updateItemsRef();
@@ -215,8 +218,8 @@
 		}
 	}
 
-	export function getBindings() {
-		return group;
+	export function getBindings(): SelectionGroupBinding {
+		return groupBindings;
 	}
 </script>
 

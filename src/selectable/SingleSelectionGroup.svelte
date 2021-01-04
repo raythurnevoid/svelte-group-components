@@ -4,7 +4,7 @@
 	import { Group } from "../components-group";
 	import type { GroupStore } from "../components-group";
 	import type {
-		SelectionGroupItem,
+		SelectionGroupItemContext,
 		OnSelectionGroupOptionsChangeEvent,
 		OnSingleSelectionGroupChangeEvent,
 	} from "./types";
@@ -18,7 +18,7 @@
 
 	let groupBindings: SelectionGroupBinding = {
 		getItems() {
-			return group.getItems() as SelectionGroupItem[];
+			return group.getItems() as SelectionGroupItemContext[];
 		},
 		updateItem,
 		registerItem,
@@ -118,7 +118,7 @@
 		// $items$ = [...$items$];
 	}
 
-	function getItemIndex(item: SelectionGroupItem) {
+	function getItemIndex(item: SelectionGroupItemContext) {
 		const items = getItems();
 		return items.indexOf(item);
 	}
@@ -134,7 +134,7 @@
 		}
 	}
 
-	async function updateItem(item: SelectionGroupItem) {
+	async function updateItem(item: SelectionGroupItemContext) {
 		const newValue = item.selected ? item.value : undefined;
 
 		if (newValue !== value) {
@@ -150,7 +150,7 @@
 		}
 	}
 
-	async function unregisterItem(item: SelectionGroupItem) {
+	async function unregisterItem(item: SelectionGroupItemContext) {
 		if (!destroyed) {
 			group$.unregisterItem(item);
 
@@ -173,7 +173,7 @@
 		}
 	}
 
-	async function registerItem(item: SelectionGroupItem) {
+	async function registerItem(item: SelectionGroupItemContext) {
 		if (!destroyed) {
 			group$.registerItem(item);
 			if (mounted) {
@@ -224,7 +224,10 @@
 		return groupBindings.getItems();
 	}
 
-	export function setSelected(item: SelectionGroupItem, selected: boolean) {
+	export function setSelected(
+		item: SelectionGroupItemContext,
+		selected: boolean
+	) {
 		if (item.selected !== selected) {
 			if (!selected && value === item.value) {
 				setValue(undefined);
@@ -236,7 +239,7 @@
 		}
 	}
 
-	export function getBindings() {
+	export function getBindings(): SelectionGroupBinding {
 		return groupBindings;
 	}
 </script>

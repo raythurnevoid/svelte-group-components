@@ -3,10 +3,13 @@
 	import { SelectionGroup } from "../../src/selectable";
 	import type {
 		SelectionGroupBinding,
-		SelectionGroupItem,
+		SelectionGroupItemContext,
 	} from "../../src/selectable";
 	import { Group } from "../../src/components-group";
-	import type { GroupBindings, GroupItem } from "../../src/components-group";
+	import type {
+		GroupBindings,
+		GroupItemContext,
+	} from "../../src/components-group";
 	import Item from "./Item.svelte";
 	import SelectableItem from "./SelectableItem.svelte";
 
@@ -16,8 +19,8 @@
 	let groupBindings: GroupBindings;
 	let selectionGroupBindings: SelectionGroupBinding;
 
-	let items: GroupItem[];
-	let selectableItems: SelectionGroupItem[];
+	let items: GroupItemContext[];
+	let selectableItems: SelectionGroupItemContext[];
 
 	onMount(async () => {
 		groupBindings = group.getBindings();

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { onDestroy, onMount, tick } from "svelte";
-	import type { GroupBindings, GroupItem } from ".";
+	import type { GroupBindings, GroupItemContext } from ".";
 
 	export let dom: HTMLElement = undefined;
 	export let context: any = undefined;
 	export let group: GroupBindings = undefined;
 
-	const self: GroupItem = {
+	const self: GroupItemContext = {
 		dom,
 		getContext() {
 			return context;
