@@ -1,26 +1,41 @@
 <script lang="ts">
 	import { UseState } from "@raythurnevoid/svelte-hooks";
-	import { onDestroy, onMount, tick } from "svelte";
-	import {
-		createComponentsGroupStore,
-	} from "../components-group";
-	import type { SelectableItem } from "./types";
-	import type { SelectionGroupBinding } from ".";
+	import { createEventDispatcher, onDestroy, onMount, tick } from "svelte";
+	import { Group } from "../components-group";
+	import type { GroupStore } from "../components-group";
+	import type {
+		SelectionGroupBinding,
+		SelectionGroupItem,
+		OnMultiSelectionGroupChangeEvent,
+		OnSelectionGroupOptionsChangeEvent,
+	} from ".";
 
 	export let value: string[] = undefined;
 	export let nullable: boolean = true;
 
-	let items$ = createComponentsGroupStore<SelectableItem>();
-	let group: SelectionGroupBinding = {
-		items$,
+	let group: Group;
+	let group$: GroupStore;
+
+	let groupBindings: SelectionGroupBinding = {
+		getItems() {
+			return group.getItems() as SelectionGroupItem[];
+		},
 		updateItem,
 		registerItem,
 		unregisterItem,
 	};
+
 	let valueState: UseState;
 	let mounted: boolean = false;
 
+	const dispatch = createEventDispatcher<{
+		change: OnMultiSelectionGroupChangeEvent;
+		optionsChange: OnSelectionGroupOptionsChangeEvent;
+	}>();
+
 	onMount(async () => {
+		group$ = group.getStore();
+
 		checkAndFixValue();
 		await tick();
 
@@ -33,8 +48,9 @@
 		} else {
 			if (value != undefined && value.length > 0) {
 				updateItems();
-				if (!isSomeItemSelected() && $items$.length) {
-					value = [$items$[0].value];
+				const items = getItems();
+				if (!isSomeItemSelected() && items.length) {
+					value = [items[0].value];
 				}
 			} else {
 				updateValue();
@@ -52,7 +68,8 @@
 	function updateItems() {
 		if (destroyed) return;
 
-		$items$.forEach((item) => {
+		const items = getItems();
+		items.forEach((item) => {
 			if (
 				(nullable && value === null) ||
 				(!item.selected && value.includes(item.value))
@@ -65,10 +82,11 @@
 	}
 
 	function checkAndFixValue() {
+		const items = getItems();
 		if (!Array.isArray(value)) {
 			if (typeof value === "string") {
 				value = [value];
-			} else if (nullable || !$items$.length) {
+			} else if (nullable || !items.length) {
 				if (value != undefined) {
 					value = undefined;
 				}
@@ -77,27 +95,28 @@
 	}
 
 	function handleValueUpdate() {
+		const items = getItems();
 		checkAndFixValue();
 
 		if (!nullable) {
 			if (
-				$items$.length &&
-				(!$items$.some((item) => value.includes(item.value)) ||
+				items.length &&
+				(!items.some((item) => value.includes(item.value)) ||
 					value == undefined ||
 					!value.length)
 			) {
-				setValue([$items$[0].value]);
+				setValue([items[0].value]);
 			}
 		}
 
 		value?.forEach((itemValue) => {
-			const item = $items$.find((item) => item.value === itemValue);
+			const item = items.find((item) => item.value === itemValue);
 			if (item && !item.selected) {
 				item.setSelected(true);
 			}
 		});
 
-		$items$
+		items
 			.filter((item) => !value || !value.includes(item.value))
 			.forEach((item) => {
 				if (item.selected) {
@@ -105,55 +124,73 @@
 				}
 			});
 
-		updateItemsRef();
+		//updateItemsRef();
 	}
 
 	function updateItemsRef() {
-		$items$ = [...$items$];
+		//$items$ = [...$items$];
 	}
 
-	function getItemIndex(item: SelectableItem) {
-		return $items$.indexOf(item);
+	function getItemIndex(item: SelectionGroupItem) {
+		const items = getItems();
+		return items.indexOf(item);
 	}
 
 	function updateValue() {
-		let newValue = $items$
-			.filter(($items$) => $items$.selected)
-			.map(($items$) => $items$.value);
+		const items = getItems();
+		let newValue = items
+			.filter((item) => item.selected)
+			.map((item) => item.value);
 
 		if (nullable) {
 			setValue(newValue);
 		} else {
 			newValue = newValue.length
 				? newValue
-				: $items$.length
-				? [$items$[0].value]
+				: items.length
+				? [items[0].value]
 				: [];
 			setValue(newValue);
 		}
 	}
 
-	function updateItem(item: SelectableItem) {
-		console.warn("updateItem", item);
+	function updateItem(item: SelectionGroupItem) {
 		updateValue();
 		updateItems();
-		updateItemsRef();
+		// updateItemsRef();
 	}
 
-	function unregisterItem(item: SelectableItem) {
-		items$.unregisterItem(item);
-		updateValue();
-	}
+	async function unregisterItem(item: SelectionGroupItem) {
+		if (!destroyed) {
+			group$.unregisterItem(item);
+			await tick();
 
-	function registerItem(item: SelectableItem) {
-		items$.registerItem(item);
-		if (mounted) {
+			const items = getItems();
+			dispatch("optionsChange", {
+				items: items,
+			});
+
 			updateValue();
 		}
 	}
 
+	function registerItem(item: SelectionGroupItem) {
+		if (!destroyed) {
+			group$.registerItem(item);
+			if (mounted) {
+				const items = getItems();
+				dispatch("optionsChange", {
+					items: items,
+				});
+
+				updateValue();
+			}
+		}
+	}
+
 	function isSomeItemSelected() {
-		return $items$.length && $items$.some((item) => item.selected);
+		const items = getItems();
+		return items.length && items.some((item) => item.selected);
 	}
 
 	function setValue(newValue: string[]) {
@@ -161,14 +198,19 @@
 		valueState?.setValue?.(value);
 	}
 
-	export function getItems() {
-		return $items$;
+	function handleNullableChange() {
+		updateValue();
+		updateItems();
 	}
 
-	export function setSelected(item: SelectableItem, selected: boolean) {
+	export function getItems() {
+		return groupBindings.getItems();
+	}
+
+	export function setSelected(item: SelectionGroupItem, selected: boolean) {
 		if (item.selected !== selected) {
 			item.setSelected(selected);
-			updateItemsRef();
+			// updateItemsRef();
 			updateValue();
 		}
 	}
@@ -181,6 +223,8 @@
 <svelte:options immutable={true} />
 
 <UseState bind:this={valueState} {value} onUpdate={handleValueUpdate} />
-<UseState value={nullable} onUpdate={updateValue} />
+<UseState value={nullable} onUpdate={handleNullableChange} />
 
-<slot {group} />
+<Group bind:this={group}>
+	<slot group={groupBindings} />
+</Group>

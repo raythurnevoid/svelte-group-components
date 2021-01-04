@@ -1,0 +1,10 @@
+{
+	"extends": "@raythurnevoid/svelte-template/tsconfig.json",
+	"include": [
+		"src/**/*"
+	],
+	"exclude": [
+		"**/node_modules/*",
+		"public/*"
+	]
+}

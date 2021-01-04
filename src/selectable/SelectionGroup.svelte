@@ -24,7 +24,7 @@
 	}
 
 	export function getItems() {
-		selectionGroup?.getItems();
+		return selectionGroup?.getItems();
 	}
 
 	export function getBindings() {

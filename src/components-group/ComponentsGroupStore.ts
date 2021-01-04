@@ -1,9 +1,10 @@
 import { Writable, writable } from "svelte/store";
 import { beforeOrAfter } from "./domBeforeOrAfter";
+import type { GroupItem } from "./types";
 
 export function createComponentsGroupStore<
-	T extends ComponentsGroupItem
->(): ComponentsGroupStore<T> {
+	T extends GroupItem
+>(): GroupStore<T> {
 	const { subscribe, set, update } = writable<T[]>([]);
 
 	return {
@@ -29,12 +30,7 @@ export function createComponentsGroupStore<
 	};
 }
 
-export interface ComponentsGroupStore<T extends ComponentsGroupItem = any>
-	extends Writable<T[]> {
+export interface GroupStore<T extends GroupItem = any> extends Writable<T[]> {
 	registerItem(item: T);
 	unregisterItem(item: T);
-}
-
-export interface ComponentsGroupItem {
-	dom: HTMLElement;
 }

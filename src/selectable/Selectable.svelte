@@ -8,15 +8,14 @@
 	import type {
 		SelectionGroupBinding,
 		OnSelectableChangeEvent,
-		SelectableItem,
-	} from "./";
+		SelectionGroupItem,
+	} from ".";
 
-	export let group: SelectionGroupBinding;
-	export let value: string;
-	export let dom: HTMLElement;
-	export let selected: boolean;
-	let componentContext: any;
-	export { componentContext as context };
+	export let group: SelectionGroupBinding = undefined;
+	export let value: string = undefined;
+	export let dom: HTMLElement = undefined;
+	export let selected: boolean = undefined;
+	export let context: any = undefined;
 
 	let mounted: boolean = false;
 	let selectedState: UseState;
@@ -25,7 +24,7 @@
 		change: OnSelectableChangeEvent;
 	}>();
 
-	const context: SelectableItem = {
+	const self: SelectionGroupItem = {
 		setSelected(newValue: boolean) {
 			if (selected !== newValue) {
 				_setSelected(newValue);
@@ -35,59 +34,56 @@
 				});
 			}
 		},
-		getComponentContext() {
-			return componentContext;
+		getContext() {
+			return context;
 		},
-	} as SelectableItem;
+	} as SelectionGroupItem;
 
 	onMount(async () => {
 		await tick();
 
-		updateContext();
-		group?.registerItem(context);
+		updateSelf();
+		group?.registerItem(self);
 
 		mounted = true;
 	});
 
 	onDestroy(async () => {
-		group?.unregisterItem?.(context);
+		updateSelf();
+		group?.unregisterItem?.(self);
 	});
 
 	export function setSelected(newValue: boolean) {
 		_setSelected(newValue);
-		group?.updateItem(context);
+		group?.updateItem(self);
 	}
 
 	function _setSelected(newValue: boolean) {
 		selected = newValue;
-		context.selected = selected;
+		self.selected = selected;
 		selectedState?.setValue(selected);
 	}
 
-	async function updateContext() {
-		Object.assign(context, {
-			selected: selected,
+	async function updateSelf(...deps) {
+		Object.assign(self, {
+			selected,
 			dom,
 			value,
 		});
-
-		if (mounted) {
-			// await tick(); Causes issues when value gets updated due to a selectable update, force the user to place 2 tick to get the value updated
-			group?.updateItem(context);
-		}
 	}
 
-	function handleSelectedValueUpdate() {
-		updateContext();
+	async function updateItem() {
+		updateSelf();
+		if (mounted) {
+			await tick();
+			group?.updateItem(self);
+		}
 	}
 </script>
 
 <svelte:options immutable={true} />
 
-<UseState
-	bind:this={selectedState}
-	value={selected}
-	onUpdate={handleSelectedValueUpdate} />
-<UseState value={[dom, value]} onUpdate={updateContext} />
+<UseState bind:this={selectedState} value={selected} onUpdate={updateItem} />
+<UseState value={[dom, value]} onUpdate={updateItem} />
 
 <slot />

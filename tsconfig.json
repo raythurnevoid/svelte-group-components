@@ -7,7 +7,6 @@
 			"DOM",
 			"ES2020",
 		],
-		"allowSyntheticDefaultImports": true,
 		"keyofStringsOnly": true
 	},
 	"include": [
