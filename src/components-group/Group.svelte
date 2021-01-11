@@ -2,6 +2,7 @@
 	import { createComponentsGroupStore } from "../components-group";
 	import type { GroupBindings, GroupItemContext } from ".";
 	import type { GroupStore } from "./ComponentsGroupStore";
+	import { setGroupContext } from "./GroupContext";
 
 	let group$ = createComponentsGroupStore();
 
@@ -13,6 +14,8 @@
 			group$.unregisterItem(item);
 		},
 	} as GroupBindings;
+
+	setGroupContext(group);
 
 	export function getBindings(): GroupBindings {
 		return group;

@@ -4,7 +4,6 @@
 	"description": "",
 	"main": "./cjs/index.js",
 	"module": "./esm/index.ts",
-	"type": "module",
 	"scripts": {
 		"clean-lib": "del-cli lib",
 		"copy:package": "copyfiles package.json lib",
@@ -27,9 +26,11 @@
 		"url": "https://github.com/raythurnevoid/svelte-group-components/issues"
 	},
 	"homepage": "https://github.com/raythurnevoid/svelte-group-components#readme",
-	"dependencies": {},
+	"dependencies": {
+		"@raythurnevoid/svelte-context-enhanced": "^0.0.1",
+		"@raythurnevoid/svelte-hooks": "^0.0.2"
+	},
 	"devDependencies": {
-		"@raythurnevoid/svelte-hooks": "^0.0.3",
 		"@tsconfig/svelte": "^1.0.10",
 		"copyfiles": "^2.4.1",
 		"del-cli": "^3.0.1",

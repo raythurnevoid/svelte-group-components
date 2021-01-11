@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { UseState } from "@raythurnevoid/svelte-hooks";
 	import { createEventDispatcher, onDestroy, onMount, tick } from "svelte";
-	import { Group } from "../components-group";
-	import type { GroupStore } from "../components-group";
+	import { createComponentsGroupStore, setGroupContext } from "../components-group";
 	import type {
 		SelectionGroupItemContext,
 		OnSelectionGroupOptionsChangeEvent,
@@ -13,17 +12,18 @@
 	export let value: string = undefined;
 	export let nullable: boolean = true;
 
-	let group: Group;
-	let group$: GroupStore;
+	let group$ = createComponentsGroupStore();
 
 	let groupBindings: SelectionGroupBinding = {
 		getItems() {
-			return group.getItems() as SelectionGroupItemContext[];
+			return $group$ as SelectionGroupItemContext[];
 		},
 		updateItem,
 		registerItem,
 		unregisterItem,
 	};
+
+	setGroupContext(groupBindings);
 
 	let valueState: UseState;
 	let mounted: boolean = false;
@@ -34,8 +34,6 @@
 	}>();
 
 	onMount(async () => {
-		group$ = group.getStore();
-
 		checkAndFixValue();
 		await tick();
 
@@ -249,6 +247,4 @@
 <UseState bind:this={valueState} {value} onUpdate={handleValueUpdate} />
 <UseState value={nullable} onUpdate={handleNullableChange} />
 
-<Group bind:this={group}>
-	<slot group={groupBindings} />
-</Group>
+<slot group={groupBindings} />

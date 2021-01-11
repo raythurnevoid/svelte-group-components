@@ -4,6 +4,7 @@
 
 <script lang="ts">
 	import { UseState } from "@raythurnevoid/svelte-hooks";
+	import { getGroupContext } from "../components-group";
 	import { createEventDispatcher, onDestroy, onMount, tick } from "svelte";
 	import type {
 		SelectionGroupBinding,
@@ -16,9 +17,14 @@
 	export let dom: HTMLElement = undefined;
 	export let selected: boolean = undefined;
 	export let context: any = undefined;
+	export let useGroupContext: boolean = false;
 
 	let mounted: boolean = false;
 	let selectedState: UseState;
+
+	if (useGroupContext && !group) {
+		group = getGroupContext() as SelectionGroupBinding;
+	}
 
 	const dispatch = createEventDispatcher<{
 		change: OnSelectableChangeEvent;
