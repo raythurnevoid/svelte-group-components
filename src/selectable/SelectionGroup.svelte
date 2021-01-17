@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { SingleSelectionGroup } from ".";
 	import MultiSelectionGroup from "./MultiSelectionGroup.svelte";
-	import type { SelectionGroupBinding, SelectionType } from "./types";
+	import type {
+		SelectionGroupBinding,
+		SelectionGroupItemContext,
+		SelectionType,
+	} from "./types";
 
 	export let selectionType: SelectionType = undefined;
 	export let value: any = undefined;
@@ -30,6 +34,13 @@
 	export function getBindings() {
 		return selectionGroup?.getBindings();
 	}
+
+	export function setSelected(
+		item: SelectionGroupItemContext,
+		selected: boolean
+	) {
+		selectionGroup.setSelected(item, selected);
+	}
 </script>
 
 {#if component}
@@ -40,7 +51,8 @@
 		{nullable}
 		on:change
 		on:optionsChange
-		let:group>
+		let:group
+	>
 		<slot {group} />
 	</svelte:component>
 {:else}

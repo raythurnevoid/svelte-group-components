@@ -1,9 +1,11 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
-	import {
-		MultiSelectionGroup,
-		SingleSelectionGroup,
-	} from "../../src/selectable";
+	import SelectionGroup from "../../../src/selectable/SelectionGroup.svelte";
 	import Item from "./_Item.svelte";
+	import type { ItemProps } from "./types";
+
+	let selectionGroup: SelectionGroup;
 
 	let value: any = ["3"];
 	let inputValue: string;
@@ -18,7 +20,7 @@
 		});
 
 	let itemsValue: string = JSON.stringify(initialItems, null, 2);
-	let items = [...initialItems];
+	export let items = [...initialItems];
 
 	//items[1].checked = true;
 	// items[2].checked = true;
@@ -41,7 +43,7 @@
 		}
 	}
 
-	function createItem(index: number): Item {
+	function createItem(index: number): ItemProps {
 		return {
 			checked: false,
 			value: "" + index,
@@ -53,9 +55,11 @@
 		items = items.filter((item) => item);
 	}
 
-	interface Item {
-		checked: boolean;
-		value: string;
+	function toggleSelectItem(index: number) {
+		// item.checked = !item.checked;
+		// items = [...items];
+		const groupItems = selectionGroup.getItems();
+		selectionGroup.setSelected(groupItems[index], !items[index].checked);
 	}
 </script>
 
@@ -69,7 +73,8 @@
 		style="font-family: consolas;"
 		bind:value={itemsValue}
 		cols={50}
-		rows={20} />
+		rows={20}
+	/>
 	<button on:click={applyItems}>apply</button>
 </div>
 
@@ -86,29 +91,25 @@
 <div>
 	{#if Array.isArray(value)}
 		{#if value.length}["{value.join('","')}"]{:else}[]{/if}
-	{:else if typeof value === 'string'}"{value}"{:else}{value}{/if}
+	{:else if typeof value === "string"}"{value}"{:else}{value}{/if}
 </div>
 
 {#key reset}
-	{#key multiSelectionType}
-		{#if multiSelectionType}
-			<MultiSelectionGroup bind:value let:group {nullable}>
-				{#each items as item, i}
-					<div>
-						<Item value={item.value} bind:checked={item.checked} {group} />
-						<button on:click={() => removeItem(i)}>remove</button>
-					</div>
-				{/each}
-			</MultiSelectionGroup>
-		{:else}
-			<SingleSelectionGroup bind:value let:group {nullable}>
-				{#each items as item, i}
-					<div>
-						<Item value={item.value} bind:checked={item.checked} {group} />
-						<button on:click={() => removeItem(i)}>remove</button>
-					</div>
-				{/each}
-			</SingleSelectionGroup>
-		{/if}
-	{/key}
+	<SelectionGroup
+		bind:this={selectionGroup}
+		selectionType={multiSelectionType ? "multi" : "single"}
+		bind:value
+		{nullable}
+		let:group
+		on:change
+		on:optionsChange
+	>
+		{#each items as item, i}
+			<div>
+				<Item value={item.value} bind:checked={item.checked} {group} />
+				<button on:click={() => removeItem(i)}>remove</button>
+				<button on:click={() => toggleSelectItem(i)}>toggle select</button>
+			</div>
+		{/each}
+	</SelectionGroup>
 {/key}

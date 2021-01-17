@@ -1,10 +1,12 @@
+<svelte:options immutable={true} />
+
 <script lang="ts" context="module">
 	let count: number = 0;
 </script>
 
 <script lang="ts">
-	import { Selectable } from "../../src/selectable";
-	import type { SelectionGroupBinding } from "../../src/selectable";
+	import { Selectable } from "../../../src/selectable";
+	import type { SelectionGroupBinding } from "../../../src/selectable";
 
 	export let value: string;
 	export let checked: boolean;
@@ -19,14 +21,13 @@
 	}
 </script>
 
-<svelte:options immutable={true} />
-
 <Selectable
 	bind:this={selectable}
 	bind:selected={checked}
 	{value}
 	{dom}
-	{group}>
+	{group}
+>
 	<label for={id}>
 		<input
 			bind:this={dom}
@@ -34,7 +35,8 @@
 			type="checkbox"
 			{value}
 			{checked}
-			on:change={handleChange} />
+			on:change={handleChange}
+		/>
 		{value}
 	</label>
 </Selectable>

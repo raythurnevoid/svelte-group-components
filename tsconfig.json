@@ -1,18 +1,12 @@
 {
-	"extends": "@tsconfig/svelte/tsconfig.json",
+	"extends": "@raythurnevoid/svelte-template/tsconfig.json",
 	"compilerOptions": {
-		"baseUrl": ".",
-		"target": "ES2019",
-		"lib": [
-			"DOM",
-			"ES2020",
-		],
-		"keyofStringsOnly": true
+		"baseUrl": "."
 	},
 	"include": [
 		"src/**/*"
 	],
 	"exclude": [
-		"**/node_modules/**/*",
+		"**/node_modules/*"
 	]
 }

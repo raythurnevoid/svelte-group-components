@@ -15,7 +15,7 @@ export interface OnSelectionGroupOptionsChangeEvent {
 }
 
 export interface OnMultiSelectionGroupChangeEvent {
-	value: string;
+	value: string[];
 }
 
 export interface OnSelectableChangeEvent {

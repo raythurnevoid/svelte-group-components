@@ -1,7 +1,12 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
 	import { UseState } from "@raythurnevoid/svelte-hooks";
 	import { createEventDispatcher, onDestroy, onMount, tick } from "svelte";
-	import { createComponentsGroupStore, setGroupContext } from "../components-group";
+	import {
+		createComponentsGroupStore,
+		setGroupContext,
+	} from "../components-group";
 	import type {
 		SelectionGroupItemContext,
 		OnSelectionGroupOptionsChangeEvent,
@@ -241,8 +246,6 @@
 		return groupBindings;
 	}
 </script>
-
-<svelte:options immutable={true} />
 
 <UseState bind:this={valueState} {value} onUpdate={handleValueUpdate} />
 <UseState value={nullable} onUpdate={handleNullableChange} />
