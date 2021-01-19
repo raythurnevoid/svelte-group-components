@@ -1,17 +1,17 @@
 <script lang="ts">
 	import { onMount, tick } from "svelte";
-	import { SelectionGroup } from "../../src/selectable";
+	import { SelectionGroup } from "../../../src/selectable";
 	import type {
 		SelectionGroupBinding,
 		SelectionGroupItemContext,
-	} from "../../src/selectable";
-	import { Group } from "../../src/components-group";
+	} from "../../../src/selectable";
+	import { Group } from "../../../src/components-group";
 	import type {
 		GroupBindings,
 		GroupItemContext,
-	} from "../../src/components-group";
-	import Item from "./Item.svelte";
-	import SelectableItem from "./SelectableItem.svelte";
+	} from "../../../src/components-group";
+	import Item from "./_components/Item.svelte";
+	import SelectableItem from "./selectable/_components/SelectableItem.svelte";
 
 	let group: Group;
 	let selectionGroup: SelectionGroup;

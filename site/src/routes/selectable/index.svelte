@@ -1,8 +1,8 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-	import type { ItemProps } from "./types";
-	import Editor from "./_Editor.svelte";
+	import type { ItemProps } from "./_components/types";
+	import Editor from "./_components/Editor.svelte";
 
 	let items: ItemProps[];
 

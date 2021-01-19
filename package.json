@@ -7,11 +7,10 @@
 	"scripts": {
 		"clean-lib": "del-cli lib",
 		"copy:package": "copyfiles package.json lib",
-		"copy:cjs": "copyfiles --up 1 src/**/*.* lib/cjs",
-		"copy:esm": "copyfiles --up 1 src/**/*.* lib/esm",
+		"copy:src": "copyfiles --up 1 src/**/*.* lib/ts",
 		"tsc:cjs": "tsc -p tsconfig.lib.cjs.json",
 		"tsc:esm": "tsc -p tsconfig.lib.esm.json",
-		"lib": "npm-run-all clean-lib copy:package copy:cjs copy:esm tsc:cjs",
+		"lib": "npm-run-all clean-lib copy:package copy:src tsc:cjs tsc:esm",
 		"prepackage": "npm run lib",
 		"package": "npm publish ./lib --access public",
 		"test": "echo \"Error: no test specified\" && exit 1"

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Selectable } from "../../src/selectable";
-	import type { SelectionGroupBinding } from "../../src/selectable";
+	import { Selectable } from "../../../../../src/selectable";
+	import type { SelectionGroupBinding } from "../../../../../src/selectable";
 
 	export let group: SelectionGroupBinding;
 	export let value: string;
@@ -13,7 +13,7 @@
 	}
 </script>
 
-<Selectable {group} {dom} context={'test'} bind:selected={checked} {value}>
+<Selectable {group} {dom} context={"test"} bind:selected={checked} {value}>
 	<input bind:this={dom} type="radio" {checked} on:change={handleChecked} />
 	radio
 </Selectable>

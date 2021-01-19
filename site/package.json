@@ -3,15 +3,21 @@
 	"version": "1.0.0",
 	"scripts": {
 		"webpack": "cross-env TS_NODE_PROJECT=\"tsconfig.tsnode.json\" webpack",
-		"build": "npm run webpack -- --env production",
-		"analyze": "npm run webpack -- --env analyzeBundle",
-		"watch": "npm run webpack -- --watch",
-		"dev": "npm run webpack -- serve --config webpack.config.devserver.ts --progress --open ",
-		"start": "sirv dist",
-		"validate": "svelte-check"
+		"clean": "del-cli dist",
+		"dev": "cross-env TS_NODE_PROJECT=\"tsconfig.tsnode.json\" ts-node node_modules/sapper/dist/cli.js dev",
+		"build": "sapper build",
+		"analyze": "npm run webpack -- --env analyzeBundle --config webpack.config.analyze.ts",
+		"export": "sapper export",
+		"start": "node __sapper__/build",
+		"debug": "node --inspect node_modules/sapper/dist/cli.js dev",
+		"validate": "svelte-check --ignore src/node_modules/@sapper"
 	},
 	"devDependencies": {
-		"@raythurnevoid/svelte-template": "^0.0.7"
+		"@raythurnevoid/svelte-sapper-template": "^0.0.2",
+		"@types/compression": "^1.7.0",
+		"@types/polka": "^0.5.2",
+		"autoprefixer": "^10.2.3",
+		"copyfiles": "^2.4.1"
 	},
 	"dependencies": {}
 }

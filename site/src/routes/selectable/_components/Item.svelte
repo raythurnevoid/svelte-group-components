@@ -5,8 +5,8 @@
 </script>
 
 <script lang="ts">
-	import { Selectable } from "../../../src/selectable";
-	import type { SelectionGroupBinding } from "../../../src/selectable";
+	import { Selectable } from "../../../../../src/selectable";
+	import type { SelectionGroupBinding } from "../../../../../src/selectable";
 
 	export let value: string;
 	export let checked: boolean;

@@ -1,9 +1,3 @@
-import createBaseConfig from "@raythurnevoid/svelte-template/webpack.config";
+import conf from "@raythurnevoid/svelte-sapper-template/webpack.config";
 
-export default function config(env) {
-	const baseConfig = createBaseConfig(env);
-
-	return {
-		...baseConfig,
-	};
-}
+export default conf;

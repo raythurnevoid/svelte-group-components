@@ -1,13 +1,15 @@
 {
-	"extends": "@raythurnevoid/svelte-template/tsconfig.json",
+	"extends": "@raythurnevoid/svelte-sapper-template/tsconfig.json",
 	"compilerOptions": {
-		"baseUrl": "."
+		"baseUrl": ".",
 	},
 	"include": [
-		"src/**/*"
+		"src/**/*",
+		"src/node_modules/**/*"
 	],
 	"exclude": [
-		"**/node_modules/*",
-		"public/*"
+		"node_modules/*",
+		"__sapper__/*",
+		"static/*"
 	]
 }

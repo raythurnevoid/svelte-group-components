@@ -1,8 +1,8 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-	import SelectionGroup from "../../../src/selectable/SelectionGroup.svelte";
-	import Item from "./_Item.svelte";
+	import SelectionGroup from "../../../../../src/selectable/SelectionGroup.svelte";
+	import Item from "./Item.svelte";
 	import type { ItemProps } from "./types";
 
 	let selectionGroup: SelectionGroup;
