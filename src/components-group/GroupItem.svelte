@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
 	import { onDestroy, onMount, tick } from "svelte";
 	import type { GroupBindings, GroupItemContext } from ".";
@@ -38,7 +40,5 @@
 		});
 	}
 </script>
-
-<svelte:options immutable={true} />
 
 <slot />

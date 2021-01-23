@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
 	import { onMount, tick } from "svelte";
 	import { SelectionGroup } from "../../../src/selectable";
@@ -17,36 +19,49 @@
 	let selectionGroup: SelectionGroup;
 
 	let groupBindings: GroupBindings;
-	let selectionGroupBindings: SelectionGroupBinding;
 
-	let items: GroupItemContext[];
+	let items: string[] = [];
+	let itemsContext: GroupItemContext[];
 	let selectableItems: SelectionGroupItemContext[];
+
+	add();
+	add();
 
 	onMount(async () => {
 		groupBindings = group.getBindings();
-		selectionGroupBindings = selectionGroup.getBindings();
 
 		await tick();
 
-		items = group.getItems();
+		handleOptionsChange();
 		selectableItems = selectionGroup.getItems();
 	});
+
+	function handleOptionsChange() {
+		itemsContext = group.getItems();
+	}
+
+	function add() {
+		items = [...items, "item"];
+	}
+
+	function remove() {
+		items = items.slice(0, -1);
+	}
 </script>
 
 <div>
-	<Group bind:this={group} let:group>
-		<Item group={groupBindings} />
-		<Item group={groupBindings} />
+	<Group bind:this={group} on:optionsChange={handleOptionsChange}>
+		{#each items as item, index}
+			<div>
+				<Item group={groupBindings} value="{item} {index}" />
+			</div>
+		{/each}
 	</Group>
 
-	<div>contexts: {items?.map((item) => item.getContext())}</div>
-</div>
-<br />
-<div>
-	<SelectionGroup selectionType="single" bind:this={selectionGroup} let:group>
-		<SelectableItem group={selectionGroupBindings} value="1" />
-		<SelectableItem group={selectionGroupBindings} value="2" />
-	</SelectionGroup>
+	<div>
+		<button on:click={add}>add</button>
+		<button on:click={remove}>remove</button>
+	</div>
 
-	<div>contexts: {selectableItems?.map((item) => item.getContext())}</div>
+	<div>contexts: {itemsContext?.map((item) => item.getContext())}</div>
 </div>

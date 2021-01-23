@@ -8,8 +8,19 @@
 		}
 	],
 	"settings": {
+		"workbench.colorCustomizations": {
+			"activityBar.background": "#2266be",
+			"activityBar.inactiveForeground": "#ffffff",
+			"activityBar.activeBackground": "#2e89ff",
+			"activityBar.foreground": "#00152e",
+			"activityBar.activeBorder": "#f3f8ff",
+			"activityBarBadge.background": "#0a0a1d",
+			"activityBarBadge.foreground": "#e7e7e7",
+		},
 		"editor.formatOnSave": true,
 		"prettier.useTabs": true,
-		"editor.insertSpaces": false
+		"editor.insertSpaces": false,
+		"typescript.tsdk": "node_modules\\typescript\\lib",
+		"typescript.preferences.importModuleSpecifier": "relative"
 	}
 }

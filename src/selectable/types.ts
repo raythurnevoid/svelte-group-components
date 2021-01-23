@@ -1,4 +1,8 @@
-import type { GroupItemContext, GroupBindings } from "../components-group";
+import type {
+	GroupItemContext,
+	GroupBindings,
+	OnGroupOptionsChangeEvent,
+} from "../components-group";
 
 export interface SelectionGroupItemContext extends GroupItemContext {
 	selected: boolean;
@@ -10,7 +14,8 @@ export interface OnSingleSelectionGroupChangeEvent {
 	value: string;
 }
 
-export interface OnSelectionGroupOptionsChangeEvent {
+export interface OnSelectionGroupOptionsChangeEvent
+	extends OnGroupOptionsChangeEvent {
 	items: SelectionGroupItemContext[];
 }
 

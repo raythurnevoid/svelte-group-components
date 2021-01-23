@@ -4,7 +4,11 @@ export interface GroupBindings<T extends GroupItemContext = GroupItemContext> {
 	getItems(): T[];
 }
 
-export interface GroupItemContext {
+export interface GroupItemContext<T = any> {
 	dom: HTMLElement;
-	getContext(): any;
+	getContext(): T;
+}
+
+export interface OnGroupOptionsChangeEvent {
+	items: GroupItemContext[];
 }
