@@ -1,5 +1,9 @@
 <svelte:options immutable={true} />
 
+<script lang="ts" context="module">
+	let count: number = 0;
+</script>
+
 <script lang="ts">
 	import { UseState } from "@raythurnevoid/svelte-hooks";
 	import { GroupItem, GroupItemInit } from "../components-group";
@@ -17,6 +21,7 @@
 	export let externalContext: any = undefined;
 	export { externalContext as context };
 	export let useGroupContext: boolean = false;
+	export const id: string = `@rt0/sgc/selectable/Selectable:${count++}`;
 
 	let mounted: boolean = false;
 	let selectedState: UseState;
@@ -32,16 +37,49 @@
 	});
 
 	async function registerItem(item: SelectionGroupItemContext) {
+		console.log(
+			"registerItem",
+			id,
+			{
+				dom: item.dom,
+				value: item.value,
+				selected: item.selected,
+			},
+			{
+				dom: context.dom,
+				value: context.value,
+				selected: context.selected,
+			}
+		);
 		updateContext();
 		group?.registerItem(item);
 	}
 
 	async function unregisterItem(item: SelectionGroupItemContext) {
+		console.log(
+			"unregisterItem",
+			id,
+			{
+				dom: item.dom,
+				value: item.value,
+				selected: item.selected,
+			},
+			{
+				dom: context.dom,
+				value: context.value,
+				selected: context.selected,
+			}
+		);
 		updateContext();
 		group?.unregisterItem?.(item);
 	}
 
 	async function updateItem() {
+		console.warn("updateItem", id, {
+			dom: context.dom,
+			value: context.value,
+			selected: context.selected,
+		});
 		updateContext();
 		if (mounted) {
 			await tick();
@@ -56,9 +94,25 @@
 	}
 
 	async function updateContext(...deps) {
+		console.log(
+			"updateContext",
+			id,
+			{
+				dom: context.dom,
+				value: context.value,
+				selected: context.selected,
+			},
+			"->",
+			{
+				dom,
+				value,
+				selected,
+			}
+		);
 		Object.assign(context, {
-			selected,
 			dom,
+			externalContext,
+			selected,
 			value,
 		});
 	}

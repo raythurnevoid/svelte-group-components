@@ -17,8 +17,9 @@
 			"activityBarBadge.background": "#0a0a1d",
 			"activityBarBadge.foreground": "#e7e7e7",
 		},
-		"editor.formatOnSave": true,
 		"prettier.useTabs": true,
+		"prettier.singleQuote": false,
+		"editor.formatOnSave": true,
 		"editor.insertSpaces": false,
 		"typescript.tsdk": "node_modules\\typescript\\lib",
 		"typescript.preferences.importModuleSpecifier": "relative"

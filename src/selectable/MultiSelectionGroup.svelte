@@ -54,8 +54,16 @@
 	});
 
 	function updateValueFromItems() {
+		const items = getItems();
 		const selectedItems = filterSelectedItems();
-		value = selectedItems.map((item) => item.value);
+		let newValue = selectedItems.map((item) => item.value);
+
+		if (!nullable && !value.length && items.length) {
+			//If not items are selected. but the value cannot be left empty, i read the first item value
+			newValue = [items[0].value];
+		}
+
+		setValue(newValue);
 	}
 
 	function updateItemsValue() {
@@ -140,35 +148,6 @@
 					item.setSelected(false);
 				}
 			});
-
-		//updateItemsRef();
-	}
-
-	function updateItemsRef() {
-		//$items$ = [...$items$];
-	}
-
-	function getItemIndex(item: SelectionGroupItemContext) {
-		const items = getItems();
-		return items.indexOf(item);
-	}
-
-	function updateValue() {
-		const items = getItems();
-		let newValue = items
-			.filter((item) => item.selected)
-			.map((item) => item.value);
-
-		if (nullable) {
-			setValue(newValue);
-		} else {
-			newValue = newValue.length
-				? newValue
-				: items.length
-				? [items[0].value]
-				: [];
-			setValue(newValue);
-		}
 	}
 
 	async function updateItem(
@@ -176,7 +155,7 @@
 		newContext: SelectionGroupItemContext
 	) {
 		innerGroup.updateItem(item, newContext);
-		updateValue();
+		updateValueFromItems();
 		updateItemsValue();
 
 		dispatch("change", {
@@ -186,6 +165,8 @@
 	}
 
 	async function unregisterItem(item: SelectionGroupItemContext) {
+		console.log("unregister", item);
+
 		if (!destroyed) {
 			innerGroup.unregisterItem(item);
 			await tick();
@@ -195,11 +176,13 @@
 				items: items,
 			});
 
-			updateValue();
+			updateValueFromItems();
 		}
 	}
 
 	async function registerItem(item: SelectionGroupItemContext) {
+		console.log("register", item);
+
 		if (!destroyed) {
 			innerGroup.registerItem(item);
 			if (mounted) {
@@ -208,7 +191,7 @@
 					items: items,
 				});
 
-				updateValue();
+				updateValueFromItems();
 			}
 		}
 	}
@@ -224,7 +207,7 @@
 	}
 
 	function handleNullableChange() {
-		updateValue();
+		updateValueFromItems();
 		updateItemsValue();
 	}
 
@@ -243,7 +226,7 @@
 		if (item.selected !== selected) {
 			item.setSelected(selected);
 			// updateItemsRef();
-			updateValue();
+			updateValueFromItems();
 		}
 	}
 

@@ -25,12 +25,15 @@
 		"url": "https://github.com/raythurnevoid/svelte-group-components/issues"
 	},
 	"homepage": "https://github.com/raythurnevoid/svelte-group-components#readme",
+	"browserslist": [
+		"defaults and supports es6-module"
+	],
 	"dependencies": {
 		"@raythurnevoid/svelte-context-enhanced": "^0.0.1",
 		"@raythurnevoid/svelte-hooks": "^0.0.2"
 	},
 	"devDependencies": {
-		"@raythurnevoid/svelte-template": "^0.0.10",
+		"@raythurnevoid/svelte-template": "^0.0.13",
 		"svelte": "^3.31.2",
 		"copyfiles": "^2.4.1",
 		"del-cli": "^3.0.1",

@@ -16,7 +16,7 @@
 		"defaults and supports es6-module"
 	],
 	"devDependencies": {
-		"@raythurnevoid/svelte-sapper-template": "^0.0.3",
+		"@raythurnevoid/svelte-sapper-template": "^0.0.4",
 		"@types/compression": "^1.7.0",
 		"@types/polka": "^0.5.2",
 		"autoprefixer": "^10.2.3",

@@ -9,6 +9,8 @@
 	} from "../../../src/components-group";
 	import Item from "./_components/Item.svelte";
 
+	if (typeof window !== "undefined") console.log(window?.location.href);
+
 	let group: Group;
 
 	let groupBindings: GroupBindings;
