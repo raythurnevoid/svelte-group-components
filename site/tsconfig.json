@@ -2,7 +2,6 @@
 	"extends": "@raythurnevoid/svelte-sapper-template/tsconfig.json",
 	"compilerOptions": {
 		"baseUrl": ".",
-		"target": "ES2020"
 	},
 	"include": [
 		"src/**/*",

@@ -3,25 +3,22 @@
 <script lang="ts">
 	import { UseState } from "@raythurnevoid/svelte-hooks";
 	import { createEventDispatcher, onDestroy, onMount, tick } from "svelte";
-	import {
-		createComponentsGroupStore,
-		setGroupContext,
-	} from "../components-group";
+	import { Group, setGroupContext } from "../components-group";
+	import type { GroupInit, GroupBindings } from "../components-group";
 	import type {
 		SelectionGroupBinding,
 		SelectionGroupItemContext,
 		OnMultiSelectionGroupChangeEvent,
 		OnSelectionGroupOptionsChangeEvent,
-	} from ".";
+	} from "./types";
 
 	export let value: string[] = undefined;
 	export let nullable: boolean = true;
 
-	let group$ = createComponentsGroupStore();
-
+	let innerGroup: GroupBindings;
 	let groupBindings: SelectionGroupBinding = {
 		getItems() {
-			return $group$ as SelectionGroupItemContext[];
+			return innerGroup.getItems() as SelectionGroupItemContext[];
 		},
 		updateItem,
 		registerItem,
@@ -39,25 +36,13 @@
 	}>();
 
 	onMount(async () => {
-		checkAndFixValue();
 		await tick();
 
-		if (nullable) {
-			if (value === null || value !== undefined) {
-				updateItems();
-			} else {
-				updateValue();
-			}
+		checkAndFixValue();
+		if (value === undefined) {
+			updateValueFromItems();
 		} else {
-			if (value != undefined && value.length > 0) {
-				updateItems();
-				const items = getItems();
-				if (!isSomeItemSelected() && items.length) {
-					value = [items[0].value];
-				}
-			} else {
-				updateValue();
-			}
+			updateItemsValue();
 		}
 
 		mounted = true;
@@ -68,7 +53,12 @@
 		destroyed = true;
 	});
 
-	function updateItems() {
+	function updateValueFromItems() {
+		const selectedItems = filterSelectedItems();
+		value = selectedItems.map((item) => item.value);
+	}
+
+	function updateItemsValue() {
 		if (destroyed) return;
 
 		const items = getItems();
@@ -84,13 +74,37 @@
 		});
 	}
 
+	function filterSelectedItems() {
+		const items = getItems();
+		return items.filter((item) => item.selected);
+	}
+
+	function isValidValue(value: string[]) {
+		if (!Array.isArray(value) || (!nullable && value?.length === 0)) {
+			return false;
+		}
+
+		const items = getItems();
+		return items.some((item) => value?.includes(item.value));
+	}
+
 	function checkAndFixValue() {
 		const items = getItems();
-		if (!Array.isArray(value)) {
-			if (typeof value === "string") {
+
+		if (!isValidValue(value)) {
+			if (typeof value === "string" && isValidValue([value])) {
+				// If value is a valid string, set it as the value.
 				value = [value];
-			} else if (nullable || !items.length) {
-				if (value != undefined) {
+			} else if (nullable) {
+				value = [];
+			} else {
+				const selectedItems = filterSelectedItems();
+				if (selectedItems.length) {
+					value = selectedItems.map((item) => item.value);
+				} else if (!selectedItems.length && items.length) {
+					value = [items[0].value];
+				} else {
+					// Set the value to undefined meaning that it should be valorized with a value from the items when available.
 					value = undefined;
 				}
 			}
@@ -157,9 +171,13 @@
 		}
 	}
 
-	function updateItem(item: SelectionGroupItemContext) {
+	async function updateItem(
+		item: SelectionGroupItemContext,
+		newContext: SelectionGroupItemContext
+	) {
+		innerGroup.updateItem(item, newContext);
 		updateValue();
-		updateItems();
+		updateItemsValue();
 
 		dispatch("change", {
 			value,
@@ -169,7 +187,7 @@
 
 	async function unregisterItem(item: SelectionGroupItemContext) {
 		if (!destroyed) {
-			group$.unregisterItem(item);
+			innerGroup.unregisterItem(item);
 			await tick();
 
 			const items = getItems();
@@ -181,9 +199,9 @@
 		}
 	}
 
-	function registerItem(item: SelectionGroupItemContext) {
+	async function registerItem(item: SelectionGroupItemContext) {
 		if (!destroyed) {
-			group$.registerItem(item);
+			innerGroup.registerItem(item);
 			if (mounted) {
 				const items = getItems();
 				dispatch("optionsChange", {
@@ -207,7 +225,11 @@
 
 	function handleNullableChange() {
 		updateValue();
-		updateItems();
+		updateItemsValue();
+	}
+
+	function handleGroupInit(props: GroupInit) {
+		innerGroup = props.group;
 	}
 
 	export function getItems() {
@@ -233,4 +255,6 @@
 <UseState bind:this={valueState} {value} onUpdate={handleValueUpdate} />
 <UseState value={nullable} onUpdate={handleNullableChange} />
 
-<slot group={groupBindings} />
+<Group onInit={handleGroupInit}>
+	<slot group={groupBindings} />
+</Group>

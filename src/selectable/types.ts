@@ -1,7 +1,7 @@
 import type {
 	GroupItemContext,
 	GroupBindings,
-	OnGroupOptionsChangeEvent,
+	OnGroupItemsUpdateEvent,
 } from "../components-group";
 
 export interface SelectionGroupItemContext extends GroupItemContext {
@@ -15,7 +15,7 @@ export interface OnSingleSelectionGroupChangeEvent {
 }
 
 export interface OnSelectionGroupOptionsChangeEvent
-	extends OnGroupOptionsChangeEvent {
+	extends OnGroupItemsUpdateEvent {
 	items: SelectionGroupItemContext[];
 }
 
@@ -29,8 +29,6 @@ export interface OnSelectableChangeEvent {
 
 export interface SelectionGroupBinding<
 	T extends SelectionGroupItemContext = SelectionGroupItemContext
-> extends GroupBindings<T> {
-	updateItem(item: T): void;
-}
+> extends GroupBindings<T> {}
 
 export type SelectionType = "single" | "multi";
