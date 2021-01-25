@@ -12,7 +12,6 @@
 	} from "./types";
 	import type { SelectionGroupBinding } from ".";
 	import { tickCargo } from "../utils";
-	import { isEqual } from "lodash-es";
 
 	export let value: string = undefined;
 	export let nullable: boolean = true;

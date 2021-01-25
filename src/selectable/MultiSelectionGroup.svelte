@@ -11,8 +11,7 @@
 		OnMultiSelectionGroupChangeEvent,
 		OnSelectionGroupOptionsChangeEvent,
 	} from "./types";
-	import { tickCargo } from "../utils";
-	import { isEqual } from "lodash-es";
+	import { arrayEquals, tickCargo } from "../utils";
 
 	export let value: string[] = undefined;
 	export let nullable: boolean = true;
@@ -126,7 +125,7 @@
 	async function handleValueUpdateAndUpdateItems(newValue: string[]) {
 		newValue = checkAndFixValue(newValue);
 
-		if (!isEqual(newValue, value)) {
+		if (!arrayEquals(newValue, value)) {
 			setValue(newValue);
 			updateItemsValue();
 

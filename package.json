@@ -1,13 +1,16 @@
 {
 	"name": "@raythurnevoid/svelte-group-components",
-	"version": "0.0.9",
+	"version": "0.0.10",
 	"description": "",
 	"main": "./cjs/index.js",
 	"module": "./esm/index.ts",
 	"scripts": {
 		"clean-lib": "del-cli lib",
 		"copy:package": "copyfiles package.json lib",
-		"copy:src": "copyfiles --up 1 src/**/*.* lib/ts",
+		"copy:src:cjs": "copyfiles --up 1 src/**/*.svelte lib/cjs",
+		"copy:src:esm": "copyfiles --up 1 src/**/*.svelte lib/esm",
+		"copy:src:ts": "copyfiles --up 1 src/**/*.* lib/ts",
+		"copy:src": "npm-run-all --parallel copy:src:cjs copy:src:esm copy:src:ts",
 		"tsc:cjs": "tsc -p tsconfig.lib.cjs.json",
 		"tsc:esm": "tsc -p tsconfig.lib.esm.json",
 		"lib": "npm-run-all clean-lib copy:package copy:src tsc:cjs tsc:esm",
@@ -33,7 +36,7 @@
 		"@raythurnevoid/svelte-hooks": "^0.0.2",
 		"@types/lodash-es": "^4.17.4",
 		"async": "^3.2.0",
-		"lodash-es": "^4.17.20"
+		"async-es": "^3.2.0"
 	},
 	"devDependencies": {
 		"@raythurnevoid/svelte-template": "^0.0.13",
