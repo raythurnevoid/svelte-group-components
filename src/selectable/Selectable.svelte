@@ -37,49 +37,16 @@
 	});
 
 	async function registerItem(item: SelectionGroupItemContext) {
-		console.log(
-			"registerItem",
-			id,
-			{
-				dom: item.dom,
-				value: item.value,
-				selected: item.selected,
-			},
-			{
-				dom: context.dom,
-				value: context.value,
-				selected: context.selected,
-			}
-		);
 		updateContext();
 		group?.registerItem(item);
 	}
 
 	async function unregisterItem(item: SelectionGroupItemContext) {
-		console.log(
-			"unregisterItem",
-			id,
-			{
-				dom: item.dom,
-				value: item.value,
-				selected: item.selected,
-			},
-			{
-				dom: context.dom,
-				value: context.value,
-				selected: context.selected,
-			}
-		);
 		updateContext();
 		group?.unregisterItem?.(item);
 	}
 
 	async function updateItem() {
-		console.warn("updateItem", id, {
-			dom: context.dom,
-			value: context.value,
-			selected: context.selected,
-		});
 		updateContext();
 		if (mounted) {
 			await tick();
@@ -94,21 +61,6 @@
 	}
 
 	async function updateContext(...deps) {
-		console.log(
-			"updateContext",
-			id,
-			{
-				dom: context.dom,
-				value: context.value,
-				selected: context.selected,
-			},
-			"->",
-			{
-				dom,
-				value,
-				selected,
-			}
-		);
 		Object.assign(context, {
 			dom,
 			externalContext,
@@ -152,8 +104,7 @@
 	}
 </script>
 
-<UseState bind:this={selectedState} value={selected} onUpdate={updateItem} />
-<UseState value={[dom, value]} onUpdate={updateItem} />
+<UseState value={[dom, value, selected]} onUpdate={updateItem} />
 
 <GroupItem bind:dom {group} {useGroupContext} onInit={handleGroupItemInit}>
 	<slot />

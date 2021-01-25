@@ -44,7 +44,6 @@
 		dom,
 		value,
 	}: Parameters<ListBoxContext["onItemFocus"]>[0]) {
-		console.log(dom);
 		focusedItemValue = value;
 	}
 </script>

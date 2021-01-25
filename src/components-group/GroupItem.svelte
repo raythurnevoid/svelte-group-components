@@ -4,6 +4,7 @@
 	import { getGroupContext } from "./GroupContext";
 	import { onDestroy, onMount, tick } from "svelte";
 	import type { GroupItemInit, GroupBindings, GroupItemContext } from "./types";
+	import { UseState } from "@raythurnevoid/svelte-hooks";
 
 	export let dom: HTMLElement = undefined;
 	export let externalContext: any = undefined;
@@ -44,8 +45,7 @@
 		group?.unregisterItem?.(context);
 	});
 
-	$: updateContext(dom, externalContext);
-	function updateContext(...deps) {
+	function updateContext() {
 		group?.updateItem(context, {
 			...getContextData(),
 		});
@@ -58,5 +58,7 @@
 		};
 	}
 </script>
+
+<UseState value={[dom, externalContext]} onUpdate={updateContext} />
 
 <slot />

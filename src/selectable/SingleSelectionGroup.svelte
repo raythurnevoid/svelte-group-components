@@ -11,6 +11,8 @@
 		OnSingleSelectionGroupChangeEvent,
 	} from "./types";
 	import type { SelectionGroupBinding } from ".";
+	import { tickCargo } from "../utils";
+	import { isEqual } from "lodash-es";
 
 	export let value: string = undefined;
 	export let nullable: boolean = true;
@@ -36,13 +38,11 @@
 	}>();
 
 	onMount(async () => {
-		const value = getValue$();
-
 		await tick();
 
-		checkAndFixValue();
+		setValue(checkAndFixValue(value));
 		if (value === undefined) {
-			updateValueFromItems();
+			setValue(getNewValueFromItems());
 		} else {
 			updateItemsValue();
 		}
@@ -58,8 +58,6 @@
 	function updateItemsValue() {
 		if (destroyed) return;
 
-		const value = getValue$();
-
 		const items = getItems();
 		items.forEach((item) => {
 			if (value === item.value && !item.selected) {
@@ -70,7 +68,12 @@
 		});
 	}
 
-	function findFirstSelectedItem() {
+	function getNewValueFromItems() {
+		const newValue = findSelectedItem()?.value;
+		return newValue;
+	}
+
+	function findSelectedItem() {
 		const items = getItems();
 		return items.find((item) => item.selected);
 	}
@@ -84,77 +87,43 @@
 		return items.some((item) => item.value === value);
 	}
 
-	function checkAndFixValue() {
-		const value = getValue$();
+	function checkAndFixValue(value: string) {
+		let newValue = value;
 
 		if (!isValidValue(value)) {
 			if (Array.isArray(value) && isValidValue(value[0])) {
 				// If value is an array, and the first element is a valid string, set it as the value.
-				setValue$(value[0]);
+				newValue = value[0];
 			} else if (nullable) {
-				setValue$(null);
+				newValue = null;
 			} else {
 				const items = getItems();
-				const firstSelectedItem = findFirstSelectedItem();
+				const firstSelectedItem = findSelectedItem();
 				if (firstSelectedItem) {
-					setValue$(firstSelectedItem.value);
+					newValue = firstSelectedItem.value;
 				} else if (!firstSelectedItem && items.length) {
-					setValue$(items[0].value);
+					newValue = items[0].value;
 				} else {
 					// Set the value to undefined meaning that it should be valorized with a value from the items when available.
-					setValue$(undefined);
+					newValue = undefined;
 				}
 			}
 		}
+
+		return newValue;
 	}
 
 	function handleValueUpdate() {
-		const items = getItems();
-		checkAndFixValue();
-
-		if (
-			!nullable &&
-			items.length &&
-			(!value || !items.some((item) => item.value === value))
-		) {
-			value = items[0].value;
-		}
-
-		if (value) {
-			const item = items.find((item) => item.value === value);
-			if (item && !item.selected) {
-				item.setSelected(true);
-			}
-		}
-
+		setValue(checkAndFixValue(value));
 		updateItemsValue();
 	}
 
-	function updateValueFromItems() {
-		const items = getItems();
-		const newValue = items.find((item) => item.selected)?.value ?? null;
-
-		if (nullable) {
-			setValue$(newValue);
-		} else {
-			setValue$(
-				newValue ? newValue : items.length ? items[0].value : undefined
-			);
-		}
-	}
-
-	async function updateItem(
-		item: SelectionGroupItemContext,
-		newContext: SelectionGroupItemContext
-	) {
-		innerGroup.updateItem(item, newContext);
-
-		const newValue = item.selected ? item.value : undefined;
+	async function handleValueUpdateAndUpdateItems(newValue: string) {
+		newValue = checkAndFixValue(newValue);
 
 		if (newValue !== value) {
 			setValue(newValue);
 			updateItemsValue();
-			// updateItemsRef();
 
 			await tick();
 
@@ -164,82 +133,70 @@
 		}
 	}
 
+	async function updateItem(
+		item: SelectionGroupItemContext,
+		newContext: SelectionGroupItemContext
+	) {
+		innerGroup.updateItem(item, newContext);
+		if (mounted) {
+			updateItemTickCargo.push(item);
+		}
+	}
+	const updateItemTickCargo = tickCargo(
+		async (updatedItems: SelectionGroupItemContext[]) => {
+			// Take last selected item
+			const newValue = updatedItems.reverse().find((item) => item.selected)
+				.value;
+			handleValueUpdateAndUpdateItems(newValue);
+		}
+	);
+
 	async function unregisterItem(item: SelectionGroupItemContext) {
 		if (!destroyed) {
 			innerGroup.unregisterItem(item);
-
-			await tick();
-
+			unregisterItemTickCargo.push(item);
+		}
+	}
+	const unregisterItemTickCargo = tickCargo(
+		async (unregisteredItems: SelectionGroupItemContext[]) => {
 			const items = getItems();
 			dispatch("optionsChange", {
 				items: items,
 			});
 
-			if (value === item.value) {
-				setValue(undefined);
-
-				await tick();
-
-				dispatch("change", {
-					value,
-				});
-			}
+			const newValue = getNewValueFromItems();
+			handleValueUpdateAndUpdateItems(newValue);
 		}
-	}
+	);
 
 	async function registerItem(item: SelectionGroupItemContext) {
 		if (!destroyed) {
 			innerGroup.registerItem(item);
 			if (mounted) {
-				const items = getItems();
-				dispatch("optionsChange", {
-					items: items,
-				});
-
-				const oldValue = value;
-				updateValueFromItems();
-				if (oldValue !== value) {
-					dispatch("change", {
-						value,
-					});
-				}
+				registerItemTickCargo.push(item);
 			}
-
-			await tick();
-
+		}
+	}
+	const registerItemTickCargo = tickCargo(
+		async (registeredItems: SelectionGroupItemContext[]) => {
 			const items = getItems();
 			dispatch("optionsChange", {
 				items: items,
 			});
+
+			const newValue = getNewValueFromItems();
+			handleValueUpdateAndUpdateItems(newValue);
 		}
-	}
+	);
 
 	function setValue(newValue: string) {
-		if (destroyed) return;
-
-		if (newValue) {
-			value = newValue;
-		} else if (nullable && !newValue) {
-			value = undefined;
-		} else if (!nullable && !newValue) {
-			const items = getItems();
-			value = items.length ? items[0].value : undefined;
-		}
-
-		valueState?.setValue(value);
+		value = newValue;
+		valueState?.setValue?.(value);
 	}
 
 	function handleNullableChange() {
-		updateValueFromItems();
-		updateItemsValue();
-	}
-
-	function getValue$() {
-		return value;
-	}
-
-	function setValue$(newValue: string) {
-		return (value = newValue);
+		let newValue = getNewValueFromItems();
+		handleValueUpdateAndUpdateItems(newValue);
 	}
 
 	function handleGroupInit(props: GroupInit) {
@@ -255,13 +212,12 @@
 		selected: boolean
 	) {
 		if (item.selected !== selected) {
-			if (!selected && value === item.value) {
-				setValue(undefined);
-			} else if (selected) {
-				setValue(item.value);
+			item.setSelected(selected);
+			let newValue = getNewValueFromItems();
+			if (selected) {
+				newValue = item.value;
 			}
-			updateItemsValue();
-			// updateItemsRef();
+			handleValueUpdateAndUpdateItems(newValue);
 		}
 	}
 

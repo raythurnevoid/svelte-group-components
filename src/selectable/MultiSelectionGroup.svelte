@@ -11,6 +11,8 @@
 		OnMultiSelectionGroupChangeEvent,
 		OnSelectionGroupOptionsChangeEvent,
 	} from "./types";
+	import { tickCargo } from "../utils";
+	import { isEqual } from "lodash-es";
 
 	export let value: string[] = undefined;
 	export let nullable: boolean = true;
@@ -38,9 +40,9 @@
 	onMount(async () => {
 		await tick();
 
-		checkAndFixValue();
+		setValue(checkAndFixValue(value));
 		if (value === undefined) {
-			updateValueFromItems();
+			setValue(getNewValueFromItems());
 		} else {
 			updateItemsValue();
 		}
@@ -53,17 +55,11 @@
 		destroyed = true;
 	});
 
-	function updateValueFromItems() {
-		const items = getItems();
+	function getNewValueFromItems() {
 		const selectedItems = filterSelectedItems();
 		let newValue = selectedItems.map((item) => item.value);
 
-		if (!nullable && !value.length && items.length) {
-			//If not items are selected. but the value cannot be left empty, i read the first item value
-			newValue = [items[0].value];
-		}
-
-		setValue(newValue);
+		return newValue;
 	}
 
 	function updateItemsValue() {
@@ -96,58 +92,50 @@
 		return items.some((item) => value?.includes(item.value));
 	}
 
-	function checkAndFixValue() {
-		const items = getItems();
+	function checkAndFixValue(value: string[]) {
+		let newValue = value;
 
 		if (!isValidValue(value)) {
 			if (typeof value === "string" && isValidValue([value])) {
 				// If value is a valid string, set it as the value.
-				value = [value];
+				newValue = [value];
 			} else if (nullable) {
-				value = [];
+				newValue = [];
 			} else {
+				const items = getItems();
 				const selectedItems = filterSelectedItems();
 				if (selectedItems.length) {
-					value = selectedItems.map((item) => item.value);
+					newValue = selectedItems.map((item) => item.value);
 				} else if (!selectedItems.length && items.length) {
-					value = [items[0].value];
+					newValue = [items[0].value];
 				} else {
 					// Set the value to undefined meaning that it should be valorized with a value from the items when available.
-					value = undefined;
+					newValue = undefined;
 				}
 			}
 		}
+
+		return newValue;
 	}
 
 	function handleValueUpdate() {
-		const items = getItems();
-		checkAndFixValue();
+		setValue(checkAndFixValue(value));
+		updateItemsValue();
+	}
 
-		if (!nullable) {
-			if (
-				items.length &&
-				(!items.some((item) => value.includes(item.value)) ||
-					value == undefined ||
-					!value.length)
-			) {
-				setValue([items[0].value]);
-			}
-		}
+	async function handleValueUpdateAndUpdateItems(newValue: string[]) {
+		newValue = checkAndFixValue(newValue);
 
-		value?.forEach((itemValue) => {
-			const item = items.find((item) => item.value === itemValue);
-			if (item && !item.selected) {
-				item.setSelected(true);
-			}
-		});
+		if (!isEqual(newValue, value)) {
+			setValue(newValue);
+			updateItemsValue();
 
-		items
-			.filter((item) => !value || !value.includes(item.value))
-			.forEach((item) => {
-				if (item.selected) {
-					item.setSelected(false);
-				}
+			await tick();
+
+			dispatch("change", {
+				value,
 			});
+		}
 	}
 
 	async function updateItem(
@@ -155,60 +143,63 @@
 		newContext: SelectionGroupItemContext
 	) {
 		innerGroup.updateItem(item, newContext);
-		updateValueFromItems();
-		updateItemsValue();
-
-		dispatch("change", {
-			value,
-		});
-		// updateItemsRef();
+		if (mounted) {
+			updateItemTickCargo.push(item);
+		}
 	}
+	const updateItemTickCargo = tickCargo(
+		async (updatedItems: SelectionGroupItemContext[]) => {
+			let newValue = getNewValueFromItems();
+			handleValueUpdateAndUpdateItems(newValue);
+		}
+	);
 
 	async function unregisterItem(item: SelectionGroupItemContext) {
-		console.log("unregister", item);
-
 		if (!destroyed) {
 			innerGroup.unregisterItem(item);
-			await tick();
-
+			unregisterItemTickCargo.push(item);
+		}
+	}
+	const unregisterItemTickCargo = tickCargo(
+		async (unregisteredItems: SelectionGroupItemContext[]) => {
 			const items = getItems();
 			dispatch("optionsChange", {
 				items: items,
 			});
 
-			updateValueFromItems();
+			const newValue = getNewValueFromItems();
+			handleValueUpdateAndUpdateItems(newValue);
 		}
-	}
+	);
 
 	async function registerItem(item: SelectionGroupItemContext) {
-		console.log("register", item);
-
 		if (!destroyed) {
 			innerGroup.registerItem(item);
 			if (mounted) {
-				const items = getItems();
-				dispatch("optionsChange", {
-					items: items,
-				});
-
-				updateValueFromItems();
+				registerItemTickCargo.push(item);
 			}
 		}
 	}
+	const registerItemTickCargo = tickCargo(
+		async (registeredItems: SelectionGroupItemContext[]) => {
+			const items = getItems();
+			dispatch("optionsChange", {
+				items: items,
+			});
 
-	function isSomeItemSelected() {
-		const items = getItems();
-		return items.length && items.some((item) => item.selected);
-	}
+			const newValue = getNewValueFromItems();
+			handleValueUpdateAndUpdateItems(newValue);
+		}
+	);
 
 	function setValue(newValue: string[]) {
 		value = newValue;
 		valueState?.setValue?.(value);
 	}
 
-	function handleNullableChange() {
-		updateValueFromItems();
-		updateItemsValue();
+	async function handleNullableChange() {
+		let newValue = getNewValueFromItems();
+		handleValueUpdateAndUpdateItems(newValue);
 	}
 
 	function handleGroupInit(props: GroupInit) {
@@ -225,8 +216,8 @@
 	) {
 		if (item.selected !== selected) {
 			item.setSelected(selected);
-			// updateItemsRef();
-			updateValueFromItems();
+			const newValue = getNewValueFromItems();
+			handleValueUpdateAndUpdateItems(newValue);
 		}
 	}
 
