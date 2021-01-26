@@ -33,7 +33,7 @@
 
 	setGroupContext(group);
 
-	onInit({ group });
+	onInit?.({ group });
 
 	onDestroy(() => {
 		destroyed = true;
