@@ -21,10 +21,10 @@
 		dom,
 		externalContext,
 		updateContext(newContext) {
-			Object.assign(context, {
+			group?.updateItem(context, {
+				...getContextData(),
 				...newContext,
 			});
-			updateContext();
 		},
 		setGroup(newGroup) {
 			group = newGroup;
@@ -43,18 +43,12 @@
 	});
 
 	onDestroy(async () => {
+		updateContext();
 		group?.unregisterItem?.(context);
 	});
 
-	function updateItem() {
-		updateContext();
-		group?.updateItem(context, {
-			...getContextData(),
-		});
-	}
-
 	function updateContext() {
-		Object.assign(context, {
+		group?.updateItem(context, {
 			...getContextData(),
 		});
 	}
@@ -67,6 +61,6 @@
 	}
 </script>
 
-<UseState value={[dom, externalContext]} onUpdate={updateItem} />
+<UseState value={[dom, externalContext]} onUpdate={updateContext} />
 
 <slot />

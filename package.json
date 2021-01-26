@@ -1,6 +1,6 @@
 {
 	"name": "@raythurnevoid/svelte-group-components",
-	"version": "0.0.14",
+	"version": "0.0.15",
 	"description": "",
 	"main": "./cjs/index.js",
 	"module": "./esm/index.ts",
