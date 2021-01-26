@@ -54,6 +54,10 @@
 		}
 	}
 
+	function getItems() {
+		return group?.getItems();
+	}
+
 	function _setSelected(newValue: boolean) {
 		selected = newValue;
 		context.selected = selected;
@@ -92,7 +96,7 @@
 			registerItem,
 			unregisterItem,
 			updateItem,
-			getItems: group.getItems,
+			getItems,
 		});
 	}
 
