@@ -62,10 +62,10 @@
 		group$.registerItem(item);
 		unregisterItemTickCargo.push(item);
 	}
-	const unregisterItemTickCargo = tickCargo(
-		async (unregisteredItems: GroupItemContext[]) => {
+	const registerItemTickCargo = tickCargo(
+		async (registeredItems: GroupItemContext[]) => {
 			dispatch("optionsChange", {
-				items: unregisteredItems,
+				items: registeredItems,
 			});
 		}
 	);
@@ -76,7 +76,7 @@
 		group$.unregisterItem(item);
 		registerItemTickCargo.push(item);
 	}
-	const registerItemTickCargo = tickCargo(
+	const unregisterItemTickCargo = tickCargo(
 		async (unregisteredItems: GroupItemContext[]) => {
 			dispatch("optionsChange", {
 				items: unregisteredItems,

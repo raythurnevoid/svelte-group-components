@@ -108,7 +108,10 @@
 	}
 </script>
 
-<UseState value={[dom, value, selected]} onUpdate={updateItem} />
+<UseState
+	value={[dom, value, selected, externalContext]}
+	onUpdate={updateItem}
+/>
 
 <GroupItem bind:dom {group} {useGroupContext} onInit={handleGroupItemInit}>
 	<slot />
