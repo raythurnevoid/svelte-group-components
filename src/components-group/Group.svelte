@@ -10,9 +10,12 @@
 		OnGroupItemUpdateEvent,
 		GroupInit,
 	} from "./types";
-	import { createEventDispatcher, tick } from "svelte";
+	import { createEventDispatcher, onDestroy, tick } from "svelte";
+	import { tickCargo } from "../utils";
 
 	export let onInit: (props: GroupInit) => void = undefined;
+
+	let destroyed: boolean = false;
 
 	const dispatch = createEventDispatcher<{
 		optionsChange: OnGroupItemsUpdateEvent;
@@ -32,39 +35,54 @@
 
 	onInit({ group });
 
+	onDestroy(() => {
+		destroyed = true;
+	});
+
 	async function updateItem(
 		item: GroupItemContext,
 		newContext: GroupItemContext
 	) {
+		if (destroyed) return;
+
 		group$.updateItem(item, newContext);
-
-		await tick();
-
-		dispatch("update", {
-			item,
-			items: $group$,
-		});
+		updateItemTickCargo.push(item);
 	}
+	const updateItemTickCargo = tickCargo(
+		async (updatedItems: GroupItemContext[]) => {
+			dispatch("update", {
+				items: updatedItems,
+			});
+		}
+	);
 
 	async function registerItem(item: GroupItemContext) {
+		if (destroyed) return;
+
 		group$.registerItem(item);
-
-		await tick();
-
-		dispatch("optionsChange", {
-			items: $group$,
-		});
+		unregisterItemTickCargo.push(item);
 	}
+	const unregisterItemTickCargo = tickCargo(
+		async (unregisteredItems: GroupItemContext[]) => {
+			dispatch("optionsChange", {
+				items: unregisteredItems,
+			});
+		}
+	);
 
 	async function unregisterItem(item: GroupItemContext) {
+		if (destroyed) return;
+
 		group$.unregisterItem(item);
-
-		await tick();
-
-		dispatch("optionsChange", {
-			items: $group$,
-		});
+		registerItemTickCargo.push(item);
 	}
+	const registerItemTickCargo = tickCargo(
+		async (unregisteredItems: GroupItemContext[]) => {
+			dispatch("optionsChange", {
+				items: unregisteredItems,
+			});
+		}
+	);
 
 	export function getBindings(): GroupBindings {
 		return group;

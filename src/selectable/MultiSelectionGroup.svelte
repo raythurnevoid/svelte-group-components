@@ -141,6 +141,8 @@
 		item: SelectionGroupItemContext,
 		newContext: SelectionGroupItemContext
 	) {
+		if (destroyed) return;
+
 		innerGroup.updateItem(item, newContext);
 		if (mounted) {
 			updateItemTickCargo.push(item);
@@ -154,10 +156,10 @@
 	);
 
 	async function unregisterItem(item: SelectionGroupItemContext) {
-		if (!destroyed) {
-			innerGroup.unregisterItem(item);
-			unregisterItemTickCargo.push(item);
-		}
+		if (destroyed) return;
+
+		innerGroup.unregisterItem(item);
+		unregisterItemTickCargo.push(item);
 	}
 	const unregisterItemTickCargo = tickCargo(
 		async (unregisteredItems: SelectionGroupItemContext[]) => {
@@ -172,11 +174,11 @@
 	);
 
 	async function registerItem(item: SelectionGroupItemContext) {
-		if (!destroyed) {
-			innerGroup.registerItem(item);
-			if (mounted) {
-				registerItemTickCargo.push(item);
-			}
+		if (destroyed) return;
+
+		innerGroup.registerItem(item);
+		if (mounted) {
+			registerItemTickCargo.push(item);
 		}
 	}
 	const registerItemTickCargo = tickCargo(

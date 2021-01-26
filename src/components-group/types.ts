@@ -17,7 +17,6 @@ export interface OnGroupItemsUpdateEvent {
 }
 
 export interface OnGroupItemUpdateEvent {
-	item: GroupItemContext;
 	items: GroupItemContext[];
 }
 
