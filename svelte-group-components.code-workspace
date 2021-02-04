@@ -23,5 +23,11 @@
 		"editor.insertSpaces": false,
 		"typescript.tsdk": "node_modules\\typescript\\lib",
 		"typescript.preferences.importModuleSpecifier": "relative"
+	},
+	"extensions": {
+		"recommendations": [
+			"svelte.svelte-vscode",
+			"esbenp.prettier-vscode"
+		]
 	}
 }

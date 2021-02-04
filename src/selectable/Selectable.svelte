@@ -6,8 +6,9 @@
 
 <script lang="ts">
 	import { UseState } from "@raythurnevoid/svelte-hooks";
-	import { GroupItem, GroupItemInit } from "../components-group";
-	import { createEventDispatcher, onDestroy, onMount, tick } from "svelte";
+	import { GroupItem } from "../components-group";
+	import type { GroupItemInit } from "../components-group";
+	import { createEventDispatcher, onMount, tick } from "svelte";
 	import type {
 		SelectionGroupBinding,
 		OnSelectableChangeEvent,
@@ -24,7 +25,6 @@
 	export const id: string = `@rt0/sgc/selectable/Selectable:${count++}`;
 
 	let mounted: boolean = false;
-	let selectedState: UseState;
 	let context: SelectionGroupItemContext;
 
 	const dispatch = createEventDispatcher<{
@@ -61,7 +61,6 @@
 	function _setSelected(newValue: boolean) {
 		selected = newValue;
 		context.selected = selected;
-		selectedState?.setValue(selected);
 	}
 
 	async function updateContext(...deps) {
