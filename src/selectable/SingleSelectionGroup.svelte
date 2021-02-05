@@ -147,7 +147,7 @@
 		async (updatedItems: SelectionGroupItemContext[]) => {
 			// Take last selected item
 			const newValue = updatedItems.reverse().find((item) => item.selected)
-				.value;
+				?.value;
 			handleValueUpdateAndUpdateItems(newValue);
 		}
 	);
