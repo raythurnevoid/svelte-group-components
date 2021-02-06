@@ -14,6 +14,7 @@
 		OnSelectableChangeEvent,
 		SelectionGroupItemContext,
 	} from ".";
+	import { cargo } from "async-es";
 
 	export let group: SelectionGroupBinding = undefined;
 	export let value: string = undefined;
@@ -26,6 +27,10 @@
 
 	let mounted: boolean = false;
 	let context: SelectionGroupItemContext;
+	let selectedState: UseState;
+	let itemStateCard = cargo(async (data: []) => {
+		await updateItem();
+	});
 
 	const dispatch = createEventDispatcher<{
 		change: OnSelectableChangeEvent;
@@ -81,7 +86,7 @@
 			setSelected(newValue: boolean) {
 				if (selected !== newValue) {
 					_setSelected(newValue);
-
+					selectedState.setValue(selected);
 					tick().then(() => {
 						dispatch("change", { selected });
 					});
@@ -107,7 +112,12 @@
 	}
 </script>
 
-<UseState value={[dom, value, selected]} onUpdate={updateItem} />
+<UseState value={[dom, value]} onUpdate={() => itemStateCard.push()} />
+<UseState
+	bind:this={selectedState}
+	value={selected}
+	onUpdate={() => itemStateCard.push()}
+/>
 
 <GroupItem {dom} {useGroupContext} onInit={handleGroupItemInit}>
 	<slot />
