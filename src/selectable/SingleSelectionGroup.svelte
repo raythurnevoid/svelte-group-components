@@ -214,9 +214,11 @@
 	) {
 		if (item.selected !== selected) {
 			item.setSelected(selected);
-			let newValue = getNewValueFromItems();
+			let newValue: string;
 			if (selected) {
 				newValue = item.value;
+			} else {
+				newValue = getNewValueFromItems();
 			}
 			handleValueUpdateAndUpdateItems(newValue);
 		}

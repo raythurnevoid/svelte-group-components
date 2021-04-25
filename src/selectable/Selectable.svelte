@@ -14,12 +14,14 @@
 		OnSelectableChangeEvent,
 		SelectionGroupItemContext,
 	} from ".";
+
 	import { cargo } from "async-es";
 
 	export let group: SelectionGroupBinding = undefined;
 	export let value: string = undefined;
 	export let dom: HTMLElement = undefined;
 	export let selected: boolean = undefined;
+	$: if (group == undefined) selected = undefined;
 	export let externalContext: any = undefined;
 	export { externalContext as context };
 	export let useGroupContext: boolean = false;
@@ -28,8 +30,9 @@
 	let mounted: boolean = false;
 	let context: SelectionGroupItemContext;
 	let selectedState: UseState;
-	let itemStateCard = cargo(async (data: []) => {
+	let itemStateCard = cargo(async (data: any, callback) => {
 		await updateItem();
+		callback();
 	});
 
 	const dispatch = createEventDispatcher<{
@@ -104,6 +107,10 @@
 		});
 	}
 
+	function handleUpdates() {
+		itemStateCard.push({});
+	}
+
 	export function setSelected(newValue: boolean) {
 		_setSelected(newValue);
 		group?.updateItem(context, {
@@ -112,12 +119,8 @@
 	}
 </script>
 
-<UseState value={[dom, value]} onUpdate={() => itemStateCard.push()} />
-<UseState
-	bind:this={selectedState}
-	value={selected}
-	onUpdate={() => itemStateCard.push()}
-/>
+<UseState value={[dom, value]} onUpdate={handleUpdates} />
+<UseState bind:this={selectedState} value={selected} onUpdate={handleUpdates} />
 
 <GroupItem {dom} {useGroupContext} onInit={handleGroupItemInit}>
 	<slot />

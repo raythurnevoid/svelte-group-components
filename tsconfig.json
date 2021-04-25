@@ -1,7 +1,10 @@
 {
 	"extends": "@raythurnevoid/svelte-template/tsconfig.json",
 	"compilerOptions": {
-		"baseUrl": "."
+		"baseUrl": ".",
+		"typeRoots": [
+			"./src/@types"
+		]
 	},
 	"include": [
 		"src/**/*"
