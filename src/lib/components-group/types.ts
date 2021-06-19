@@ -1,4 +1,4 @@
-import type { GroupStoreBindings } from "./ComponentsGroupStore";
+import type { GroupStoreBindings } from "./ComponentsGroupStore.js";
 
 export interface GroupBindings<T extends GroupItemContext = GroupItemContext>
 	extends GroupStoreBindings<T> {

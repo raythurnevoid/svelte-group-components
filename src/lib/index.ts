@@ -1,1 +1,1 @@
-export * from "./components-group";
+export * from "./components-group/index.js";

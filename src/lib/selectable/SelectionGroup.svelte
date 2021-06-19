@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { SingleSelectionGroup } from ".";
+	import { SingleSelectionGroup } from "./index.js";
 	import MultiSelectionGroup from "./MultiSelectionGroup.svelte";
 	import type {
 		SelectionGroupBinding,

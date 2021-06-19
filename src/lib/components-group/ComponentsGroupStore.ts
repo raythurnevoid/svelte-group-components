@@ -1,6 +1,6 @@
 import { Writable, writable } from "svelte/store";
-import { beforeOrAfter } from "./domBeforeOrAfter";
-import type { GroupItemContext } from ".";
+import { beforeOrAfter } from "./domBeforeOrAfter.js";
+import type { GroupItemContext } from "./index.js";
 
 export function createComponentsGroupStore<
 	T extends GroupItemContext

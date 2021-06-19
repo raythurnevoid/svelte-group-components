@@ -3,8 +3,8 @@
 <script lang="ts">
 	import { UseState } from "@raythurnevoid/svelte-hooks";
 	import { createEventDispatcher, onDestroy, onMount, tick } from "svelte";
-	import { Group, setGroupContext } from "../components-group";
-	import type { GroupInit, GroupBindings } from "../components-group";
+	import { Group, setGroupContext } from "../components-group/index.js";
+	import type { GroupInit, GroupBindings } from "../components-group/index.js";
 	import type {
 		SelectionGroupItemContext,
 		OnSelectionGroupOptionsChangeEvent,

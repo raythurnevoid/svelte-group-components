@@ -1,9 +1,13 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-	import { getGroupContext } from "./GroupContext";
+	import { getGroupContext } from "./GroupContext.js";
 	import { onDestroy, onMount, tick } from "svelte";
-	import type { GroupItemInit, GroupBindings, GroupItemContext } from "./types";
+	import type {
+		GroupItemInit,
+		GroupBindings,
+		GroupItemContext,
+	} from "./types.js";
 	import { UseState } from "@raythurnevoid/svelte-hooks";
 
 	export let dom: HTMLElement = undefined;

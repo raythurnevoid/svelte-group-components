@@ -2,7 +2,7 @@ import type {
 	GroupItemContext,
 	GroupBindings,
 	OnGroupItemsUpdateEvent,
-} from "../components-group";
+} from "../components-group/index.js";
 
 export interface SelectionGroupItemContext extends GroupItemContext {
 	selected: boolean;

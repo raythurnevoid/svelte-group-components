@@ -6,8 +6,8 @@
 
 <script lang="ts">
 	import { UseState } from "@raythurnevoid/svelte-hooks";
-	import { GroupItem } from "../components-group";
-	import type { GroupItemInit } from "../components-group";
+	import { GroupItem } from "../components-group/index.js";
+	import type { GroupItemInit } from "../components-group/index.js";
 	import { createEventDispatcher, onMount, tick } from "svelte";
 	import type {
 		SelectionGroupBinding,

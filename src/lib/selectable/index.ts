@@ -9,4 +9,4 @@ export {
 	Selectable,
 	SelectionGroup,
 };
-export * from "./types";
+export * from "./types.js";

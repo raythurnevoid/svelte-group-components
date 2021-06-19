@@ -1,10 +1,10 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-	import { createComponentsGroupStore } from "../components-group";
-	import type { GroupBindings, GroupItemContext } from ".";
-	import type { GroupStore } from "./ComponentsGroupStore";
-	import { setGroupContext } from "./GroupContext";
+	import { createComponentsGroupStore } from "../components-group/index.js";
+	import type { GroupBindings, GroupItemContext } from "./index.js";
+	import type { GroupStore } from "./ComponentsGroupStore.js";
+	import { setGroupContext } from "./GroupContext.js";
 	import type {
 		OnGroupItemsUpdateEvent,
 		OnGroupItemUpdateEvent,
