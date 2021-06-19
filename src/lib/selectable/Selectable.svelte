@@ -35,9 +35,10 @@
 		callback();
 	});
 
-	const dispatch = createEventDispatcher<{
-		change: OnSelectableChangeEvent;
-	}>();
+	const dispatch =
+		createEventDispatcher<{
+			change: OnSelectableChangeEvent;
+		}>();
 
 	onMount(async () => {
 		await tick();

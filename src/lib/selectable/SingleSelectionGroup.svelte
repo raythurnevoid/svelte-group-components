@@ -6,14 +6,14 @@
 	import { Group, setGroupContext } from "../components-group";
 	import type { GroupInit, GroupBindings } from "../components-group";
 	import type {
-		SelectionGroupBinding,
 		SelectionGroupItemContext,
-		OnMultiSelectionGroupChangeEvent,
 		OnSelectionGroupOptionsChangeEvent,
+		OnSingleSelectionGroupChangeEvent,
 	} from "./types";
-	import { arrayEquals, tickCargo } from "../utils";
+	import type { SelectionGroupBinding } from ".";
+	import { tickCargo } from "../utils";
 
-	export let value: string[] = undefined;
+	export let value: string = undefined;
 	export let nullable: boolean = true;
 
 	let innerGroup: GroupBindings;
@@ -31,10 +31,11 @@
 	let valueState: UseState;
 	let mounted: boolean = false;
 
-	const dispatch = createEventDispatcher<{
-		change: OnMultiSelectionGroupChangeEvent;
-		optionsChange: OnSelectionGroupOptionsChangeEvent;
-	}>();
+	const dispatch =
+		createEventDispatcher<{
+			change: OnSingleSelectionGroupChangeEvent;
+			optionsChange: OnSelectionGroupOptionsChangeEvent;
+		}>();
 
 	onMount(async () => {
 		await tick();
@@ -54,59 +55,54 @@
 		destroyed = true;
 	});
 
-	function getNewValueFromItems() {
-		const selectedItems = filterSelectedItems();
-		let newValue = selectedItems.map((item) => item.value);
-
-		return newValue;
-	}
-
 	function updateItemsValue() {
 		if (destroyed) return;
 
 		const items = getItems();
 		items.forEach((item) => {
-			if (
-				(nullable && value === null) ||
-				(!item.selected && value.includes(item.value))
-			) {
+			if (value === item.value && !item.selected) {
 				item.setSelected(true);
-			} else if (item.selected && !value.includes(item.value)) {
+			} else if (value !== item.value && item.selected) {
 				item.setSelected(false);
 			}
 		});
 	}
 
-	function filterSelectedItems() {
-		const items = getItems();
-		return items.filter((item) => item.selected);
+	function getNewValueFromItems() {
+		const newValue = findSelectedItem()?.value;
+		return newValue;
 	}
 
-	function isValidValue(value: string[]) {
-		if (!Array.isArray(value) || (!nullable && value?.length === 0)) {
+	function findSelectedItem() {
+		const items = getItems();
+		return items.find((item) => item.selected);
+	}
+
+	function isValidValue(value: string) {
+		if (typeof value !== "string" || (!nullable && value == undefined)) {
 			return false;
 		}
 
 		const items = getItems();
-		return items.some((item) => value?.includes(item.value));
+		return items.some((item) => item.value === value);
 	}
 
-	function checkAndFixValue(value: string[]) {
+	function checkAndFixValue(value: string) {
 		let newValue = value;
 
 		if (!isValidValue(value)) {
-			if (typeof value === "string" && isValidValue([value])) {
-				// If value is a valid string, set it as the value.
-				newValue = [value];
+			if (Array.isArray(value) && isValidValue(value[0])) {
+				// If value is an array, and the first element is a valid string, set it as the value.
+				newValue = value[0];
 			} else if (nullable) {
-				newValue = [];
+				newValue = null;
 			} else {
 				const items = getItems();
-				const selectedItems = filterSelectedItems();
-				if (selectedItems.length) {
-					newValue = selectedItems.map((item) => item.value);
-				} else if (!selectedItems.length && items.length) {
-					newValue = [items[0].value];
+				const firstSelectedItem = findSelectedItem();
+				if (firstSelectedItem) {
+					newValue = firstSelectedItem.value;
+				} else if (!firstSelectedItem && items.length) {
+					newValue = items[0].value;
 				} else {
 					// Set the value to undefined meaning that it should be valorized with a value from the items when available.
 					newValue = undefined;
@@ -122,10 +118,10 @@
 		updateItemsValue();
 	}
 
-	async function handleValueUpdateAndUpdateItems(newValue: string[]) {
+	async function handleValueUpdateAndUpdateItems(newValue: string) {
 		newValue = checkAndFixValue(newValue);
 
-		if (!arrayEquals(newValue, value)) {
+		if (newValue !== value) {
 			setValue(newValue);
 			updateItemsValue();
 
@@ -150,7 +146,10 @@
 	}
 	const updateItemTickCargo = tickCargo(
 		async (updatedItems: SelectionGroupItemContext[]) => {
-			let newValue = getNewValueFromItems();
+			// Take last selected item
+			const newValue = updatedItems
+				.reverse()
+				.find((item) => item.selected)?.value;
 			handleValueUpdateAndUpdateItems(newValue);
 		}
 	);
@@ -193,12 +192,12 @@
 		}
 	);
 
-	function setValue(newValue: string[]) {
+	function setValue(newValue: string) {
 		value = newValue;
 		valueState?.setValue?.(value);
 	}
 
-	async function handleNullableChange() {
+	function handleNullableChange() {
 		let newValue = getNewValueFromItems();
 		handleValueUpdateAndUpdateItems(newValue);
 	}
@@ -217,7 +216,12 @@
 	) {
 		if (item.selected !== selected) {
 			item.setSelected(selected);
-			const newValue = getNewValueFromItems();
+			let newValue: string;
+			if (selected) {
+				newValue = item.value;
+			} else {
+				newValue = getNewValueFromItems();
+			}
 			handleValueUpdateAndUpdateItems(newValue);
 		}
 	}

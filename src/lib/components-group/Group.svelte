@@ -17,10 +17,11 @@
 
 	let destroyed: boolean = false;
 
-	const dispatch = createEventDispatcher<{
-		optionsChange: OnGroupItemsUpdateEvent;
-		update: OnGroupItemUpdateEvent;
-	}>();
+	const dispatch =
+		createEventDispatcher<{
+			optionsChange: OnGroupItemsUpdateEvent;
+			update: OnGroupItemUpdateEvent;
+		}>();
 
 	let group$ = createComponentsGroupStore<GroupItemContext>();
 
