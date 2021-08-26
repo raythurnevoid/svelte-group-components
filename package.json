@@ -1,6 +1,6 @@
 {
 	"name": "@raythurnevoid/svelte-group-components",
-	"version": "0.0.27",
+	"version": "0.0.28",
 	"description": "",
 	"scripts": {
 		"clean-lib": "del-cli lib",
@@ -43,7 +43,7 @@
 	"homepage": "https://github.com/raythurnevoid/svelte-group-components#readme",
 	"dependencies": {
 		"@raythurnevoid/svelte-context-enhanced": "^1.0.1",
-		"@raythurnevoid/svelte-hooks": "^0.0.8",
+		"@raythurnevoid/svelte-hooks": "^0.0.9",
 		"@types/lodash-es": "^4.17.4",
 		"async-es": "^3.2.1"
 	},
