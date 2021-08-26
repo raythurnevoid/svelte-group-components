@@ -1,6 +1,6 @@
 {
 	"name": "@raythurnevoid/svelte-group-components",
-	"version": "0.0.26",
+	"version": "0.0.27",
 	"description": "",
 	"scripts": {
 		"clean-lib": "del-cli lib",
@@ -42,14 +42,14 @@
 	},
 	"homepage": "https://github.com/raythurnevoid/svelte-group-components#readme",
 	"dependencies": {
-		"@raythurnevoid/svelte-context-enhanced": "^0.0.7",
+		"@raythurnevoid/svelte-context-enhanced": "^1.0.1",
 		"@raythurnevoid/svelte-hooks": "^0.0.8",
 		"@types/lodash-es": "^4.17.4",
-		"async-es": "^3.2.0"
+		"async-es": "^3.2.1"
 	},
 	"devDependencies": {
-		"@raythurnevoid/svelte-template": "^0.1.4",
-		"@types/async": "^3.2.6",
-		"svelte": "^3.38.2"
+		"@raythurnevoid/svelte-template": "^0.2.10",
+		"@types/async": "^3.2.7",
+		"svelte": "^3.42.3"
 	}
 }
